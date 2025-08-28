@@ -19,6 +19,8 @@ STICKER_REPLIES = [
     os.getenv("LINE_STICKER_REPLY03", "").strip(),
 ]
 
+STICKER_REPLIES = [r for r in STICKER_REPLIES if r]
+
 # Logging Configuration
 logging.basicConfig(
     level=logging.INFO,
