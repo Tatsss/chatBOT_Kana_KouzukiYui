@@ -6,13 +6,18 @@ import os
 import uvicorn
 import requests
 import logging
+import random
 
 app = FastAPI()
 openai_client = OpenAIClient()
 db = FirestoreDB()
 
 LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
-STICKER_REPLY = os.getenv("LINE_STICKER_REPLY", "")
+STICKER_REPLIES = [
+    os.getenv("LINE_STICKER_REPLY01", "").strip(),
+    os.getenv("LINE_STICKER_REPLY02", "").strip(),
+    os.getenv("LINE_STICKER_REPLY03", "").strip(),
+]
 
 # Logging Configuration
 logging.basicConfig(
@@ -52,10 +57,14 @@ async def webhook(body: LineWebhookBody):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {LINE_ACCESS_TOKEN}"
             }
+
+            reply_text = random.choice(STICKER_REPLIES) if STICKER_REPLIES else "スタンプありがとう☺️"
+
             payload = {
                 "replyToken": event.replyToken,
-                "messages": [{"type": "text", "text": STICKER_REPLY}]
+                "messages": [{"type": "text", "text": reply_text}]
             }
+
             requests.post("https://api.line.me/v2/bot/message/reply", headers=headers, json=payload)
             return {"status": "success"}
 
